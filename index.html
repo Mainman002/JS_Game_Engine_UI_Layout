@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Game Engine UI Layout</title>
+  <link rel='stylesheet' href='css/style.css'>
+</head>
+<body>
+  <script type='module' src='js/engine.js'></script>
+
+  <section id='total'>
+    <header id='topBar'>
+      <input id='btn' type="button" value="File">
+      <input id='btn' type="button" value="Edit">
+      <input id='btn' type="button" value="About">
+      <!-- <input id='btn' type="range" default="0.5" minlength="0" maxlength="1"> -->
+    </header>
+
+    <section id='main'>
+      <aside id='leftBar'>
+        <input id='btn' type="button" value="Select">
+        <input id='btn' type="button" value="Pencil">
+        <input id='btn' type="button" value="Eraser">
+        <input id='btn' type="button" value="Line">
+        <input id='btn' type="button" value="Hand">
+        <!-- <input id='btn' type="range" default="0.5" minlength="0" maxlength="1">
+        <input id='btn' type="range" default="0.5" minlength="0" maxlength="1"> -->
+      </aside>
+
+      <canvas id='canvas'></canvas>
+      <!-- <canvas id='pixels'></canvas> -->
+
+      <aside id='rightBar'>
+        <div id='colors'>
+          <input class='brushColor' id='btn' type="color">
+          <!-- <input id='btn' type="color"> -->
+        </div>
+
+        <!-- <div id='colors'>
+          <input id='btn' type="color">
+          <input id='btn' type="color">
+        </div> -->
+        
+        <div id='slider'>
+          <h1 id='text'>
+            <input class='brushSize' id='btn' type="range" value="0.02" min="0.02" max="255" step="0.01" oninput="this.nextElementSibling.value = this.value">
+            Brush Size:
+            <output>0.02</output>
+          </h1>
+        </div>
+        
+        <input id='btn' type="button" value="New Layer">
+        <input id='btn' type="button" value="Delete Layer">
+        <input id='btn' type="button" value="Clear Canvas">
+
+      </aside>
+    </section>
+
+    <footer id='bottomBar'></footer>
+  </section>
+
+  
+</body>
+</html>

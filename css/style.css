@@ -1,0 +1,127 @@
+* {
+  /* background-color: rgb(0, 0, 0); */
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  /* border: 3px solid rgb(163, 0, 0); */
+  background-color: rgb(0, 0, 0);
+  position: absolute;
+  width: 100vw; 
+  height: 100vh;
+}
+
+#total {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  /* transform: translate(5%, 5%); */
+}
+
+#topBar {
+  border: solid 1px rgb(73, 76, 80);
+  background-color: rgb(41, 42, 45);
+  display: flex;
+  flex-direction: row;
+  align-items:stretch;
+  height: 24px;
+}
+
+#leftBar {
+  border: solid 1px rgb(73, 76, 80);
+  background-color: rgb(32, 33, 36);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0.5%;
+  padding-top: 1.5%;
+}
+
+#main {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  }
+
+#canvas {
+  border: solid 1px rgb(0, 100, 131);
+  background-color: rgb(41, 59, 85);
+  margin: 10px;
+  align-items:stretch;
+}
+
+/* #pixels {
+  background-color: lightpink;
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+} */
+
+#rightBar {
+  /* border: solid 1px rgb(73, 76, 80); */
+  background-color: rgb(32, 33, 36);
+  display: flex;
+  flex-direction: column;
+  align-items:stretch;
+  height: 100%;
+  padding: 0.5%;
+  padding-top: 1.5%;
+}
+
+#bottomBar {
+  border: solid 1px rgb(73, 76, 80);
+  background-color: rgb(41, 42, 45);
+  display: flex;
+  flex-direction: row;
+  align-items:stretch;
+  height: 24px;
+}
+
+#topBar #btn {
+  margin-left: 0.5%;
+}
+
+#bottomBar #btn {
+  margin-left: 0.5%;
+}
+
+#leftBar #btn, #rightBar #btn {
+  margin-bottom: 4%;
+}
+
+/* #rightBar #btn {
+  margin-bottom: 5%;
+} */
+
+#btn {
+  background-color: rgb(18, 20, 28);
+  color: rgb(154, 156, 154);
+}
+
+#text {
+  color: rgb(154, 156, 154);
+}
+
+#bottomBar #text, #topBar #text {
+  visibility: hidden;
+  color: rgb(154, 156, 154);
+}
+
+#slider {
+  /* border: solid 1px rgb(73, 76, 80); */
+  background-color: rgb(32, 33, 36);
+  display: flex;
+  flex-direction: column;
+  width: 132px;
+  /* align-items:stretch; */
+  /* height: 100%; */
+  /* padding: 0.5%;
+  padding-top: 1.5%; */
+}
