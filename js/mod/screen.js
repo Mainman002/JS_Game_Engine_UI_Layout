@@ -11,18 +11,18 @@ export function Init (_main, _canvas) {
 
 export function Edge (_canvas) {
   return {
-    left: 0,
-    right: _canvas.width,
-    up: 0,
-    down: _canvas.height
+    left: 100,
+    right: 100 + _canvas.width,
+    up: 100,
+    down: 100 + _canvas.height
   }
 }
 
 export function Resize (_main, _ctx, _canvas) {
-  const border = 16
+  const border = 72
 
   const aspectList = {
-    box: { w: 5, h: 4 },
+    box: { w: 4, h: 3 },
     wide: { w: 6.5, h: 4 }
   }
 
@@ -30,22 +30,23 @@ export function Resize (_main, _ctx, _canvas) {
 
   const ImgSmooth = false
   let w = window.innerWidth
-  let h = w * (aspect.h / aspect.w)
+  let h = w
+  // let h = w * (aspect.h / aspect.w)
 
   if (h < window.innerHeight) {
     // Check window width
     w = window.innerWidth
-    h = w * (aspect.h / aspect.w)
+    h = w
   } else {
     // Check window height
     h = window.innerHeight
-    w = h * (aspect.w / aspect.h)
+    w = h
   }
 
   if (_main.debug) console.log('Resized', 'W', Math.floor(w), 'H', Math.floor(h))
 
-  _canvas.style.width = `${w - border}px`
-  _canvas.style.height = `${h - 62 - border}px`
+  _canvas.style.width = `${w - border * 2}px`
+  _canvas.style.height = `${h - border * 2}px`
 
   // Graphic sharpness
   _ctx.mozImageSmoothingEnabled = ImgSmooth

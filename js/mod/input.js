@@ -27,8 +27,10 @@ export function Input (_main, _canvas) {
     _main.input.pos.y *= _canvas.height
 
     // Floor position values to whole numbers
-    _main.input.pos.x = Math.floor(_main.input.pos.x - _main.input.size.w * 0.5)
-    _main.input.pos.y = Math.floor(_main.input.pos.y - _main.input.size.h * 0.5)
+    _main.input.pos.x = Math.floor(_main.input.pos.x)
+    _main.input.pos.y = Math.floor(_main.input.pos.y)
+    // _main.input.pos.x = Math.floor(_main.input.pos.x - _main.input.size.w * 0.5)
+    // _main.input.pos.y = Math.floor(_main.input.pos.y - _main.input.size.h * 0.5)
 
     if (!_main.input.isTouching) {
       _main.input.isTouching = true
@@ -123,5 +125,7 @@ export function GetTouchPos (_main, _canvas, e) {
     // Floor position values to whole numbers
     _main.input.pos.x = Math.floor(_main.input.pos.x)
     _main.input.pos.y = Math.floor(_main.input.pos.y)
+    // _main.input.pos.x = Math.floor(_main.input.pos.x - _main.input.size.w * 0.5)
+    // _main.input.pos.y = Math.floor(_main.input.pos.y - _main.input.size.h * 0.5)
   }
 }

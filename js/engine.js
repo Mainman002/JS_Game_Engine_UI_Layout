@@ -1,46 +1,64 @@
-// import * as ModMath from './mod/math.js'
 import * as Screen from './mod/screen.js'
-import * as Loader from './mod/loader.js'
+import {Loader_Init, Loader_Image} from './mod/loader.js'
 import * as Graphic from './mod/graphic.js'
-// import * as Collision from './mod/collision.js'
 import * as Input from './mod/input.js'
 import { Player } from './object/player.js'
-// import { Block } from 'object/block.js'
-// import { Update } from './mod/update.js'
 
+const mouseCursor = document.getElementsByTagName("body")[0];
+
+// H1 Text Items
+const infoText = document.querySelector('.brushTool')
 const brushSize = document.querySelector('.brushSize')
 const brushColor = document.querySelector('.brushColor')
-// const pixelCanvas = document.getElementById('pixels')
+
+// Left Panel Buttons
+const toolPencil = document.querySelector('.pencil')
+const toolEraser = document.querySelector('.eraser')
+const toolPicker = document.querySelector('.picker')
 
 class Main {
   constructor () {
     this.ctx = canvas.getContext('2d')
-    // this.pixelCtx = pixelCanvas.getContext('2d')
+    this.bgCtx = bg.getContext('2d')
+    this.interactCtx = interact.getContext('2d')
     this.index = 0
 
-    this.window_size = { w: 480, h: 320 }
+    this.window_size = { w: 16, h: 16 }
     this.game_state = 'MainMenu'
     this.start_btn = false
-    this.players = []
-    this.blocks = []
-    this.lasers = []
     this.blockLimits = { min_x: 1, max_x: 7, min_y: 2, max_y: 10 }
-    this.colors = ['Red', 'Orange', 'Yellow', 'Green', 'Teal', 'White']
 
-    // this.objects = {}
-
-    // this.objects = {}
-    this.objects = {}
-
-    // this.pos = { x: canvas.width * 0.5, y: canvas.height * 0.5 }
-
-    // this.touch = {}
     this.input = {
       pos: { x: -5, y: -5 },
-      size: { w: 8, h: 8 },
+      size: { w: 1, h: 1 },
       isTouching: false,
       click: false,
-      color: 'Black'
+      color: '#000000',
+      activeTool: 'Pencil',
+    }
+    
+    this.images = {
+      Pencil: Loader_Image('../img/cursor/MC1_normal.png'),
+      Eraser: Loader_Image('../img/cursor/MC1_normal.png'),
+      Picker: Loader_Image('../img/cursor/MC1_normal.png'),
+    }
+    
+    this.toolImages = {
+      Pencil: this.images.Pencil,
+      Eraser: this.images.Eraser,
+      Picker: this.images.Picker,
+    }
+
+    this.cursors = {
+      Pencil: 'url(../img/cursor/MC1_normal.png), auto',
+      Eraser: 'url(../img/cursor/MC1_normal.png), auto',
+      Picker: 'url(../img/cursor/MC1_normal.png), auto',
+    }
+
+    this.toolInfo = {
+      Pencil: `Left_Mouse: draw pixel | shift+Left_Mouse: draw strait line`,
+      Eraser: `Left_Mouse: erase pixel | shift+Left_Mouse: erase strait line`,
+      Picker: `Left_Mouse: Select color from pixel`,
     }
 
     this.gamepads = {}
@@ -51,10 +69,6 @@ class Main {
       gamepadDown: undefined,
       gamepadLeft: undefined,
       gamepadRight: undefined
-    }
-
-    this.images = {
-      // player_sprites: Loader.NewImage('img/player_sheet.png')
     }
   }
 
@@ -87,81 +101,52 @@ class Main {
   ObjectInstance (_dict, _ob) {
     _dict[`${this.index}`] = { id: this.index, object: _ob }
     ++this.index
-    // console.log(_dict)
   }
 
   ObjectDelete (_dict) {
     Object.keys(this.objects).forEach((key, value) => {
       if (this.objects[key].object.SetToRemove) {
-        // console.log(this.objects[this.objects[key].id])
         delete this.objects[this.objects[key].id]
-        // --this.index
-        // this.index = this.objects[this.objects[key]]
       }
     })
-
-    // Object.keys(this.objects).forEach((key, value) => {
-    //   this.objects[key].id = this.objects[key].id - 1
-    // })
 
     this.index = Object.keys(this.objects).length
   }
 
   init () {
-    // this.blocks.push(new Block(this,
-    //   { x: 0 + 4, y: 4 },
-    //   { w: 128, h: canvas.height - 8 }, 'rgb(15,15,15)'))
 
-    // this.blocks.push(new Block(this,
-    //   { x: canvas.width - 128 - 4, y: 4 },
-    //   { w: 128, h: canvas.height - 8 }, 'rgb(15,15,15)'))
-
-    // for (let x = 0; x < 14; ++x) {
-    //   for (let y = 0; y < 9; ++y) {
-    //     this.blocks.push(new Block(this,
-    //       { x: 0 + 35 * x, y: 0 + 35 * y },
-    //       { w: 32, h: 32 }, 'Teal'))
-    //   }
-    // }
-
-    // this.players.push(new Player(this,
-    //   { x: canvas.width * 0.5 - 28, y: canvas.height - 64 },
-    //   { w: 64, h: 64 }, 'red'))
   }
 
   draw () {
-    // Object.keys(this.objects.currentId).forEach((key, value) => {
-    //   this.objects.currentId.object.draw()
-    // })
+    if (this.input.activeTool === 'Pencil') {
+      Graphic.Rect(this.interactCtx, this.input.pos, this.input.size, this.input.color, 1)
+    }
+    
+    if (this.input.activeTool === 'Eraser') {
+      Graphic.DrawImageSimple(this.interactCtx, this.toolImages[this.input.activeTool], this.input.pos, this.input.size, 1)
+    }
 
-    Object.keys(this.objects).forEach((key, value) => {
-      this.objects[key].object.draw()
-      // console.log(this.objects[key].id)
-      // this.objects.key.object.draw()
-    })
+    if (this.input.activeTool === 'Picker') {
+      Graphic.Rect(this.interactCtx, this.input.pos, {w: 1, h: 1}, this.input.color, 1)
+    }
+    
+    if (this.input.click && (this.input.pos.x >= canvas.style.left && this.input.pos.y >= canvas.style.top || this.input.pos.x <= canvas.style.right && this.input.pos.y <= canvas.style.bottom)) {
+      if (this.input.activeTool === 'Pencil') {
+        Graphic.Rect(this.ctx, this.input.pos, this.input.size, this.input.color, 1)
+      }
 
-    // this.objects.forEach(value => {
-    //   value.draw()
-    // })
+      if (this.input.activeTool === 'Eraser') {
+        this.ctx.clearRect(this.input.pos.x, this.input.pos.y, this.input.size.w, this.input.size.h)
+      }
 
-    // this.lasers.forEach(ob => ob.draw())
-    this.blocks.forEach(ob => ob.draw())
-    this.players.forEach(ob => ob.draw())
-
-    // if (this.touch[0] && this.touch[1]) {
-    //   Line(this.ctx, { x: this.touch[0].pos.x, y: this.touch[0].pos.y }, { x: this.touch[1].pos.x, y: this.touch[1].pos.y }, { w: 0, h: 0 }, 3, 'Teal')
-    // }
-    // if (this.touch[1] && this.touch[2]) {
-    //   Line(this.ctx, { x: this.touch[1].pos.x, y: this.touch[1].pos.y }, { x: this.touch[2].pos.x, y: this.touch[2].pos.y }, { w: 0, h: 0 }, 3, 'Teal')
-    // }
-
-    // Draw_Image_Simple( this.ctx, this.images.player_sprites, {x:64, y: 64}, {w: 64, h: 64}, 1 );
-    // Draw_Image( this.ctx, this.images.player_sprites,
-    //     {x: 0, y: 0}, {w: 36, h: 42},
-    //     {x: 32, y: 64}, {w: 64, h: 64}, 1 );
-
-    Graphic.Rect(this.ctx, this.input.pos, this.input.size, this.input.color, 1)
-    // Graphic.DrawText(this.ctx, `Lasers:${this.index}`, 'left', null, { x: 8, y: 20 }, 16, 'White', 1)
+      if (this.input.activeTool === 'Picker') {
+        const color = this.ctx.getImageData(this.input.pos.x, this.input.pos.y, 1, 1).data
+        const combinedColor = rgbToHex(color[0], color[1], color[2])
+        this.input.color = combinedColor
+        brushColor.value = combinedColor
+        // console.log(this.input.color)
+      }
+    }
   }
 
   update (dt) {
@@ -178,49 +163,46 @@ class Main {
         this.controller.gamepadRight = gamepad[this.gamepadId].buttons[15].pressed || gamepad[this.gamepadId].axes[0] === 1
       }
     }
-
-    // for (const value of this.objects.values()) {
-    //   value.update(dt)
-    // }
-
-    //   function logMapElements(value, key, map) {
-    //     console.log(`map.get('${key}') = ${value}`)
-    // }
-
-    // this.objects.forEach(logMapElements)
-
-    // this.objects.forEach((value, key) => {
-    //   this.objects.get(key) = value
-    //   // key.value.update(dt)
-    // })
-
-    // this.objects.forEach(value => {
-    //   value.update(dt)
-    // })
-
-    // Object.keys(this.objects.object).forEach(key => {
-    // if (this.objects[key]) {
-    // this.objects[key].update(dt)
-    // }
-    // })
-
-    Object.keys(this.objects).forEach((key, value) => {
-      this.objects[key].object.update(dt)
-      // this.objects.currentId.object.update(dt)
-    })
-
-    // this.lasers.forEach(ob => ob.update(dt))
-    this.blocks.forEach(ob => ob.update(dt))
-    this.players.forEach(ob => ob.update(dt))
   }
+}
+
+function setColor(_main, _color) {
+  if (_main.input.color !== _color) _main.input.color = _color
 }
 
 addEventListener('load', (e) => {
   const main = new (Main)()
   Screen.Init(main, canvas)
-  // Screen.Init(main, pixelCanvas)
+  Screen.Init(main, bg)
+  Screen.Init(main, interact)
   Input.Input(main, canvas)
+  Loader_Init(main.images)
+
   main.init()
+  updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
+  
+  function updateInfoBar(_h1, _keys) {
+    _h1.innerHTML = `[${main.input.activeTool}] ${_keys}`
+    mouseCursor.style.cursor = main.cursors[main.input.activeTool]
+  }
+
+  toolPencil.addEventListener('click', function(e) {
+    main.input.activeTool = 'Pencil'
+    updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
+    // setColor(main, main.input.color)
+  })
+
+  toolEraser.addEventListener('click', function(e) {
+    main.input.activeTool = 'Eraser'
+    updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
+    // setColor(main, main.input.color)
+  })
+
+  toolPicker.addEventListener('click', function(e) {
+    main.input.activeTool = 'Picker'
+    updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
+    // setColor(main, main.input.color)
+  })
 
   brushSize.addEventListener('change', function(e) {
     const size = e.target.value
@@ -239,18 +221,21 @@ addEventListener('load', (e) => {
   brushColor.addEventListener('change', function(e) {
     const color = e.target.value
     const combinedColor = hexToRGB(color)
-    if (main.input.color !== combinedColor) main.input.color = combinedColor
+    setColor(main, combinedColor)
+    // if (main.input.color !== combinedColor) main.input.color = combinedColor
   })
 
   brushColor.addEventListener('input', function(e) {
     const color = e.target.value
     const combinedColor = hexToRGB(color)
-    if (main.input.color !== combinedColor) main.input.color = combinedColor
+    setColor(main, combinedColor)
+    // if (main.input.color !== combinedColor) main.input.color = combinedColor
   })
 
   addEventListener('resize', (e) => {
+    Screen.Resize(main, main.bgCtx, bg)
     Screen.Resize(main, main.ctx, canvas)
-    // Screen.Resize(main, main.pixelCtx, pixelCanvas)
+    Screen.Resize(main, main.interactCtx, interact)
   })
 
   const deltaTime = 1 / 60
@@ -261,7 +246,7 @@ addEventListener('load', (e) => {
     accumulatedTime += (time - lastTime) / 1000
 
     while (accumulatedTime > deltaTime) {
-      main.ctx.clearRect(0, 0, canvas.width, canvas.height)
+      main.interactCtx.clearRect(0, 0, canvas.width, canvas.height)
 
       main.update(deltaTime)
       main.draw()
@@ -269,11 +254,19 @@ addEventListener('load', (e) => {
       accumulatedTime -= deltaTime
     }
     requestAnimationFrame(update)
-    // setTimeout(update, 1000/60, performance.now());
     lastTime = time
   }
   update(0)
 })
+
+function componentToHex(c) {
+  var hex = c.toString(16);
+  return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(r, g, b) {
+  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
 
 function hexToRGB(hex){
   const r = parseInt(hex.substr(1,2), 16)

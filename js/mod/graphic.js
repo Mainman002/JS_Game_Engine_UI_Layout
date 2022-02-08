@@ -15,9 +15,8 @@ export function DrawText (_ctx, _text, _align, _font, _pos, _size, _color, _a) {
 }
 
 export function DrawImage (_ctx, _image, _frame, _spriteSize, _pos, _size, _a) {
-  _ctx.globalAlpha = _a
-
   _ctx.save()
+  _ctx.globalAlpha = _a
   _ctx.translate(_pos.x, _pos.y)
   // _ctx.rotate(_rot);
 
@@ -31,10 +30,13 @@ export function DrawImage (_ctx, _image, _frame, _spriteSize, _pos, _size, _a) {
 }
 
 export function DrawImageSimple (_ctx, _image, _pos, _size, _a) {
+  _ctx.save()
   _ctx.globalAlpha = _a
 
   _ctx.drawImage(_image,
     _pos.x, _pos.y, _size.w, _size.h)
+
+  _ctx.restore()
   _ctx.globalAlpha = 1.0
 }
 
