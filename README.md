@@ -3,4 +3,4 @@ A javascript simple game engine ui layout
 
 [Live Preview](https://mainman002.github.io/JS_Game_Engine_UI_Layout/)
 
-![image](https://user-images.githubusercontent.com/11281480/152908198-64642d7d-8daf-4ad1-8f9e-c5b78834d626.png)
+![image](https://user-images.githubusercontent.com/11281480/152951484-157a10fb-fb11-4d94-a46c-0ba1d7834f9b.png)
