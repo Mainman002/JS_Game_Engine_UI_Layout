@@ -18,6 +18,7 @@ const toolPencil = document.querySelector('.pencil')
 const toolLine = document.querySelector('.line')
 const toolEraser = document.querySelector('.eraser')
 const toolPicker = document.querySelector('.picker')
+const toolGrid = document.querySelector('.gridBtn')
 
 // Right Panel Buttons
 const clearCanvasButton = document.querySelector('.clearCanvasButton')
@@ -30,7 +31,7 @@ class Main {
     this.interactCtx = interact.getContext('2d')
     this.index = 0
 
-    this.window_size = { w: 20, h: 20 }
+    this.window_size = { w: 40, h: 40 }
     this.game_state = 'MainMenu'
     this.start_btn = false
     this.blockLimits = { min_x: 1, max_x: 7, min_y: 2, max_y: 10 }
@@ -44,33 +45,34 @@ class Main {
       released: false,
       color: '#000000',
       activeTool: 'Pencil',
+      lastTool: 'Pencil',
     }
 
     this.visibleGrid = 'hidden'
     
     this.images = {
-      Pencil: Loader_Image('../img/cursor/MC1_normal.png'),
-      Line: Loader_Image('../img/cursor/MC1_normal.png'),
-      Eraser: Loader_Image('../img/cursor/MC1_normal.png'),
-      Picker: Loader_Image('../img/cursor/MC1_normal.png'),
+      Pencil: Loader_Image('../img/buttons/Pencil_Tool.png'),
+      Line: Loader_Image('../img/buttons/Line_Tool.png'),
+      Eraser: Loader_Image('../img/buttons/Eraser_Tool.png'),
+      Picker: Loader_Image('../img/buttons/Picker_Tool.png'),
     }
     
     this.toolImages = {
+      Pencil: '../img/buttons/Pencil_Tool.png',
+      Line: '../img/buttons/Line_Tool.png',
+      Eraser: '../img/buttons/Eraser_Tool.png',
+      Picker: '../img/buttons/Picker_Tool.png',
+    }
+
+    this.cursors = {
       Pencil: this.images.Pencil,
       Line: this.images.Line,
       Eraser: this.images.Eraser,
       Picker: this.images.Picker,
     }
 
-    this.cursors = {
-      Pencil: 'url(../img/cursor/MC1_normal.png), auto',
-      Line: 'url(../img/cursor/MC1_normal.png), auto',
-      Eraser: 'url(../img/cursor/MC1_normal.png), auto',
-      Picker: 'url(../img/cursor/MC1_normal.png), auto',
-    }
-
     this.toolInfo = {
-      Pencil: `Left_Mouse: draw pixel`,
+      Pencil: `Left_Mouse: draw pixel | Ctrl: color picker | Shift: draw line | Alt: Erase | G: toggle grid`,
       Line: `Left_Mouse: draw a strait line`,
       Eraser: `Left_Mouse: erase pixel`,
       Picker: `Left_Mouse: Select color from pixel`,
@@ -230,7 +232,7 @@ addEventListener('load', (e) => {
   
   function updateInfoBar(_h1, _keys) {
     _h1.innerHTML = `[${main.input.activeTool}] ${_keys}`
-    // mouseCursor.style.cursor = main.cursors[main.input.activeTool]
+    mouseCursor.style.cursor = `url(${main.toolImages[main.input.activeTool]}), default`
   }
 
   saveButton.addEventListener('click', function(e) {
@@ -259,6 +261,10 @@ addEventListener('load', (e) => {
   toolPicker.addEventListener('click', function(e) {
     main.input.activeTool = 'Picker'
     updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
+  })
+
+  toolGrid.addEventListener('click', function(e) {
+    gridVisibilityToggle()
   })
 
   brushSize.addEventListener('change', function(e) {
@@ -290,8 +296,8 @@ addEventListener('load', (e) => {
   })
 
   // Keyboard
-  addEventListener("keydown", keyListener);
-  // addEventListener("keyup", keyListener);
+  addEventListener("keydown", keyListenerPress);
+  addEventListener("keyup", keyListenerRelease);
 
   addEventListener('resize', (e) => {
     Screen.Resize(main, main.bgCtx, bg)
@@ -299,6 +305,79 @@ addEventListener('load', (e) => {
     Screen.Resize(main, main.gridCtx, grid)
     Screen.Resize(main, main.interactCtx, interact)
   })
+
+  function keyListenerPress (event) {
+    this.key_state = (event.type === "keydown")?true:false;
+  
+    if (event.key === 'g') {
+      gridVisibilityToggle()
+    } else if (event.key === 'Control') {
+      // main.input.lastTool = main.input.activeTool
+      main.input.lastTool = 'Pencil'
+      main.input.activeTool = 'Picker'
+      updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
+    } else if (event.key === 'Shift') {
+      // main.input.lastTool = main.input.activeTool
+      main.input.lastTool = 'Pencil' 
+      main.input.activeTool = 'Line'
+      updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
+    } else if (event.key === 'Alt') {
+      // main.input.lastTool = main.input.activeTool
+      main.input.lastTool = 'Pencil' 
+        main.input.activeTool = 'Eraser'
+        updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
+    }
+
+    // switch(event.key) {
+    //   case "g":
+    //     gridVisibilityToggle()
+    //   break
+    //   case "Control":
+    //     main.input.lastTool = main.input.activeTool
+    //     main.input.activeTool = 'Picker'
+    //     updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
+    //     // toolSetPicker()
+    //   break
+    //   case "Shift":
+    //     main.input.lastTool = main.input.activeTool 
+    //     main.input.activeTool = 'Line'
+    //     updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
+    //   break
+    //   case "Alt":
+    //     main.input.lastTool = main.input.activeTool 
+    //     main.input.activeTool = 'Eraser'
+    //     updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
+    //   break
+    // }
+  }
+
+  function keyListenerRelease (event) {
+    this.key_state = (event.type === "keydown")?true:false;
+
+    if (event.key === 'Control' || event.key === 'Shift' || event.key === 'Alt') {
+      main.input.activeTool = main.input.lastTool
+      updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
+    }
+  
+    // switch(event.key) {
+    //   case "g":
+    //     gridVisibilityToggle()
+    //   break
+    //   case "Control":
+    //     main.input.activeTool = main.input.lastTool
+    //     updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
+    //     // toolSetPicker()
+    //   break
+    //   case "Shift":
+    //     main.input.activeTool = main.input.lastTool
+    //     updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
+    //   break
+    //   case "Alt":
+    //     main.input.activeTool = main.input.lastTool
+    //     updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
+    //   break
+    // }
+  }
 
   const deltaTime = 1 / 60
   let accumulatedTime = 0
@@ -376,13 +455,11 @@ function gridVisibilityToggle () {
   gridVisibility(main.visibleGrid)
 }
 
-function keyListener (event) {
-  this.key_state = (event.type === "keydown")?true:false;
+function addCanvasLayer(_name) {
+  const canv = document.createElement(_name);
+  canv.id = _name;
 
-  switch(event.key) {
-    case "g":
-      gridVisibilityToggle()
-    break
-  }
+  document.body.appendChild(canv); // adds the canvas to the body element
+  // document.getElementById('someBox').appendChild(canv); // adds the canvas to #someBox
 }
 
