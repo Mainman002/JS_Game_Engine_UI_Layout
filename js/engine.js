@@ -11,10 +11,16 @@ const infoText = document.querySelector('.brushTool')
 const brushSize = document.querySelector('.brushSize')
 const brushColor = document.querySelector('.brushColor')
 
+// Top Panel Buttons
+const saveButton = document.querySelector('.saveButton')
+
 // Left Panel Buttons
 const toolPencil = document.querySelector('.pencil')
 const toolEraser = document.querySelector('.eraser')
 const toolPicker = document.querySelector('.picker')
+
+// Right Panel Buttons
+const clearCanvasButton = document.querySelector('.clearCanvasButton')
 
 class Main {
   constructor () {
@@ -23,7 +29,7 @@ class Main {
     this.interactCtx = interact.getContext('2d')
     this.index = 0
 
-    this.window_size = { w: 16, h: 16 }
+    this.window_size = { w: 20, h: 20 }
     this.game_state = 'MainMenu'
     this.start_btn = false
     this.blockLimits = { min_x: 1, max_x: 7, min_y: 2, max_y: 10 }
@@ -56,8 +62,8 @@ class Main {
     }
 
     this.toolInfo = {
-      Pencil: `Left_Mouse: draw pixel | shift+Left_Mouse: draw strait line`,
-      Eraser: `Left_Mouse: erase pixel | shift+Left_Mouse: erase strait line`,
+      Pencil: `Left_Mouse: draw pixel`,
+      Eraser: `Left_Mouse: erase pixel`,
       Picker: `Left_Mouse: Select color from pixel`,
     }
 
@@ -130,7 +136,18 @@ class Main {
       Graphic.Rect(this.interactCtx, this.input.pos, {w: 1, h: 1}, this.input.color, 1)
     }
     
-    if (this.input.click && (this.input.pos.x >= canvas.style.left && this.input.pos.y >= canvas.style.top || this.input.pos.x <= canvas.style.right && this.input.pos.y <= canvas.style.bottom)) {
+    const inCanvasArea = (
+      this.input.pos.x >= 0 &&
+      this.input.pos.x <= this.window_size.w &&
+      this.input.pos.y >= 0 &&
+      this.input.pos.y <= this.window_size.h
+    )
+
+    // console.log(inCanvasArea)
+
+    // if (inCanvasArea) console.log(inCanvasArea)
+
+    if (this.input.click && inCanvasArea) {
       if (this.input.activeTool === 'Pencil') {
         Graphic.Rect(this.ctx, this.input.pos, this.input.size, this.input.color, 1)
       }
@@ -185,6 +202,14 @@ addEventListener('load', (e) => {
     _h1.innerHTML = `[${main.input.activeTool}] ${_keys}`
     mouseCursor.style.cursor = main.cursors[main.input.activeTool]
   }
+
+  saveButton.addEventListener('click', function(e) {
+    saveImage()
+  })
+
+  clearCanvasButton.addEventListener('click', function(e) {
+    main.ctx.clearRect(0, 0, canvas.width, canvas.height)
+  })
 
   toolPencil.addEventListener('click', function(e) {
     main.input.activeTool = 'Pencil'
@@ -273,4 +298,14 @@ function hexToRGB(hex){
   const g = parseInt(hex.substr(3,2), 16)
   const b = parseInt(hex.substr(5,2), 16)
   return `rgb(${r}, ${g}, ${b})`
+}
+
+function saveImage(){
+  const downloadLink = document.createElement('a');
+  downloadLink.setAttribute('download', 'Pixels.png');
+  const canvas = document.getElementById('canvas');
+  const dataURL = canvas.toDataURL('image/png');
+  const url = dataURL.replace(/^data:image\/png/,'data:application/octet-stream');
+  downloadLink.setAttribute('href', url);
+  downloadLink.click();
 }

@@ -13,25 +13,18 @@
 
   <section class="noselect" id='total'>
     <header class="noselect" id='topBar'>
-      <input id='btn' type="button" value="File">
-      <input id='btn' type="button" value="Edit">
-      <input id='btn' type="button" value="About">
+      <input class='saveButton' id='btn' type="image" src="img/buttons/Save_Icon.png" value="Save Image">
+      <!-- <input class='saveButton' id='btn' type="button" value="Save Image"> -->
+      <!-- <input id='btn' type="button" value="Edit"> -->
+      <!-- <input id='btn' type="button" value="About"> -->
       <!-- <input id='btn' type="range" default="0.5" minlength="0" maxlength="1"> -->
     </header>
 
     <section class="noselect" id='main'>
       <aside class="noselect" id='leftBar'>
-        <input class='pencil' id='btn' type="image" src="../img/buttons/pencil1_normal.png" value="New Layer">
-        <input class='eraser' id='btn' type="image" src="../img/buttons/eraser1_normal.png" value="New Layer">
-        <input class='picker' id='btn' type="image" src="../img/buttons/picker1_normal.png" value="New Layer">
-
-        <!-- <input id='btn' type="button" value="Select"> -->
-        <!-- <input id='btn' type="button" value="Pencil"> -->
-        <!-- <input id='btn' type="button" value="Eraser"> -->
-        <!-- <input id='btn' type="button" value="Line"> -->
-        <!-- <input id='btn' type="button" value="Hand"> -->
-        <!-- <input id='btn' type="range" default="0.5" minlength="0" maxlength="1">
-        <input id='btn' type="range" default="0.5" minlength="0" maxlength="1"> -->
+        <input class='pencil' id='btn' type="image" src="img/buttons/pencil1_normal.png" value="Pencil">
+        <input class='eraser' id='btn' type="image" src="img/buttons/eraser1_normal.png" value="Eraser">
+        <input class='picker' id='btn' type="image" src="img/buttons/picker1_normal.png" value="Picker">
       </aside>
 
       <div id='canvasContainer'>
@@ -39,7 +32,6 @@
         <canvas id="canvas" width="256" height="256"></canvas>
         <canvas id="interact" width="256" height="256"></canvas>
       </div>
-      <!-- <canvas id='pixels'></canvas> -->
 
       <aside id='rightBar'>
         <div id='colors'>
@@ -60,9 +52,9 @@
           </h1>
         </div>
         
-        <input id='btn' type="button" value="New Layer">
-        <input id='btn' type="button" value="Delete Layer">
-        <input id='btn' type="button" value="Clear Canvas">
+        <!-- <input id='btn' type="button" value="New Layer"> -->
+        <!-- <input id='btn' type="button" value="Delete Layer"> -->
+        <input class='clearCanvasButton' id='btn' type="button" value="Clear Canvas">
 
       </aside>
     </section>
@@ -71,7 +63,6 @@
       <h3 class='brushTool' id='text'>Text</h3>
     </footer>
   </section>
-
   
 </body>
 </html>
