@@ -63,7 +63,7 @@ html {
   position: relative;  
 }
 
-#canvas, #bg, #interact {
+#canvas, #bg, #interact, #grid {
     top: 50%;
     left: 50%;
     position: absolute;
@@ -74,10 +74,27 @@ html {
     image-rendering: pixelated;
 }
 
+#bg, #interact, #grid {
+  pointer-events: none;
+}
+
 #bg {
   border: solid 4px rgb(0, 174, 255);
   background-image: url('../img/canvas/transparentBG1.png');
-  background-size: 16px 16px;
+  background-size: 5%, 5%;
+  /* background-size: cover; */
+  /* background-size: 31.1px 31.1px; */
+  filter: brightness(50%);
+}
+
+#grid {
+  border: solid 4px rgb(0, 174, 255);
+  background-image: url('../img/canvas/grid1.png');
+  background-size: 5%, 5%;
+  /* background-size: cover; */
+  /* background-size: 31.1px 31.1px; */
+  filter: brightness(70%);
+  /* visibility: hidden; */
 }
 
 #rightBar {

@@ -33,11 +33,16 @@ export function Input (_main, _canvas) {
     // _main.input.pos.y = Math.floor(_main.input.pos.y - _main.input.size.h * 0.5)
 
     if (!_main.input.isTouching) {
+      // _main.input.startPos = _main.input.pos 
       _main.input.isTouching = true
     }
   })
 
   addEventListener('mousedown', (e) => {
+    if (!_main.input.click) {
+      _main.input.startPos = {x: _main.input.pos.x, y: _main.input.pos.y} 
+    }
+
     if (_main.input.isTouching) {
       _main.input.click = true
       // _main.input.click = false
@@ -47,6 +52,7 @@ export function Input (_main, _canvas) {
 
   addEventListener('mouseup', (e) => {
     if (_main.input.isTouching) {
+      // _main.input.startPos = {x: -5, y: -5}
       _main.input.isTouching = false
       _main.input.click = true
       _main.input.click = false
@@ -57,6 +63,7 @@ export function Input (_main, _canvas) {
     this.GetTouchPos(_main, canvas, e)
 
     if (!_main.input.isTouching) {
+      _main.input.startPos = {x: _main.input.pos.x, y: _main.input.pos.y}
       _main.input.isTouching = true
       _main.input.click = true
     }
@@ -73,6 +80,7 @@ export function Input (_main, _canvas) {
 
   addEventListener('touchend', (e) => {
     if (_main.input.isTouching) {
+      // _main.input.startPos = {x: -5, y: -5}
       _main.input.isTouching = false
       _main.input.click = true
       _main.input.click = false
@@ -81,21 +89,8 @@ export function Input (_main, _canvas) {
 
   addEventListener('touchcancel', (e) => {
     if (_main.input.isTouching) {
+      // _main.input.startPos = {x: -5, y: -5}
       _main.input.isTouching = false
-    }
-  })
-
-  // handle gamepad input
-  addEventListener('gamepadconnected', (e) => {
-    if (!_main.gamepads[e.gamepad.index]) {
-      _main.gamepads[e.gamepad.index] = {}
-      _main.gamepads[e.gamepad.index].id = e.gamepad.index
-    }
-  })
-
-  addEventListener('gamepaddisconnected', (e) => {
-    if (_main.gamepads[e.gamepad.index]) {
-      delete _main.gamepads[e.gamepad.index]
     }
   })
 }

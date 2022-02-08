@@ -2,7 +2,6 @@ import * as Screen from './mod/screen.js'
 import {Loader_Init, Loader_Image} from './mod/loader.js'
 import * as Graphic from './mod/graphic.js'
 import * as Input from './mod/input.js'
-import { Player } from './object/player.js'
 
 const mouseCursor = document.getElementsByTagName("body")[0];
 
@@ -16,6 +15,7 @@ const saveButton = document.querySelector('.saveButton')
 
 // Left Panel Buttons
 const toolPencil = document.querySelector('.pencil')
+const toolLine = document.querySelector('.line')
 const toolEraser = document.querySelector('.eraser')
 const toolPicker = document.querySelector('.picker')
 
@@ -26,6 +26,7 @@ class Main {
   constructor () {
     this.ctx = canvas.getContext('2d')
     this.bgCtx = bg.getContext('2d')
+    this.gridCtx = grid.getContext('2d')
     this.interactCtx = interact.getContext('2d')
     this.index = 0
 
@@ -35,34 +36,42 @@ class Main {
     this.blockLimits = { min_x: 1, max_x: 7, min_y: 2, max_y: 10 }
 
     this.input = {
+      startPos: { x: -5, y: -5 },
       pos: { x: -5, y: -5 },
       size: { w: 1, h: 1 },
       isTouching: false,
       click: false,
+      released: false,
       color: '#000000',
       activeTool: 'Pencil',
     }
+
+    this.visibleGrid = 'hidden'
     
     this.images = {
       Pencil: Loader_Image('../img/cursor/MC1_normal.png'),
+      Line: Loader_Image('../img/cursor/MC1_normal.png'),
       Eraser: Loader_Image('../img/cursor/MC1_normal.png'),
       Picker: Loader_Image('../img/cursor/MC1_normal.png'),
     }
     
     this.toolImages = {
       Pencil: this.images.Pencil,
+      Line: this.images.Line,
       Eraser: this.images.Eraser,
       Picker: this.images.Picker,
     }
 
     this.cursors = {
       Pencil: 'url(../img/cursor/MC1_normal.png), auto',
+      Line: 'url(../img/cursor/MC1_normal.png), auto',
       Eraser: 'url(../img/cursor/MC1_normal.png), auto',
       Picker: 'url(../img/cursor/MC1_normal.png), auto',
     }
 
     this.toolInfo = {
       Pencil: `Left_Mouse: draw pixel`,
+      Line: `Left_Mouse: draw a strait line`,
       Eraser: `Left_Mouse: erase pixel`,
       Picker: `Left_Mouse: Select color from pixel`,
     }
@@ -120,16 +129,30 @@ class Main {
   }
 
   init () {
-
+    gridVisibility (this.visibleGrid)
+    // grid.style.visibility = this.visibleGrid
   }
 
   draw () {
+    // Graphic.Rect(this.bgCtx, {x: 0, y: 0}, {w: canvas.width, h: canvas.height}, "Black", 0.1)
+
     if (this.input.activeTool === 'Pencil') {
       Graphic.Rect(this.interactCtx, this.input.pos, this.input.size, this.input.color, 1)
     }
+
+    if (this.input.activeTool === 'Line') {
+      Graphic.Rect(this.interactCtx, this.input.pos, {w: 1, h: 1}, this.input.color, 1)
+    }
     
     if (this.input.activeTool === 'Eraser') {
-      Graphic.DrawImageSimple(this.interactCtx, this.toolImages[this.input.activeTool], this.input.pos, this.input.size, 1)
+      const color = this.ctx.getImageData(this.input.pos.x, this.input.pos.y, this.input.size.w, this.input.size.h).data
+      const invertedColor = {r: color[0], g: color[1], b: color[2]}
+      // const combinedColor = rgbToHex(invertedColor.r, invertedColor.g, invertedColor.b)
+
+      const combinedColor = invertRGB(invertedColor)
+
+      Graphic.Rect(this.interactCtx, this.input.pos, this.input.size, combinedColor, 0.5)
+      // Graphic.DrawImageSimple(this.interactCtx, this.toolImages[this.input.activeTool], this.input.pos, this.input.size, 1)
     }
 
     if (this.input.activeTool === 'Picker') {
@@ -164,22 +187,24 @@ class Main {
         // console.log(this.input.color)
       }
     }
+
+    if (this.input.activeTool === 'Line' && this.input.click) {
+      Graphic.ActionLine(this.input.startPos, this.input.pos, this.input.color, this.interactCtx, 1)
+      this.input.released = true
+    } else {
+      if (this.input.released) {
+        Graphic.ActionLine(this.input.startPos, this.input.pos, this.input.color, this.ctx, 1)
+        this.input.startPos = {x: -5, y: -5}
+        this.input.released = false
+      }
+    }
+
+    // Graphic.LineGrid(this.gridCtx, 1, {x: 5, y: 5}, {x: 3, y: 3})
+    // Graphic.Line(this.interactCtx, {x: this.input.startPos.x, y: this.input.startPos.y}, {x: this.input.pos.x, y: this.input.pos.y}, 1, 3, this.input.color)
   }
 
   update (dt) {
-    // handle gamepad input
-    const gamepad = navigator.getGamepads()
-
-    if (gamepad) {
-      for (const gamepadIndex in this.gamepads) {
-        this.gamepadId = this.gamepads[gamepadIndex].id
-
-        this.controller.gamepadUp = gamepad[this.gamepadId].buttons[12].pressed || gamepad[this.gamepadId].axes[1] === -1
-        this.controller.gamepadDown = gamepad[this.gamepadId].buttons[13].pressed || gamepad[this.gamepadId].axes[1] === 1
-        this.controller.gamepadLeft = gamepad[this.gamepadId].buttons[14].pressed || gamepad[this.gamepadId].axes[0] === -1
-        this.controller.gamepadRight = gamepad[this.gamepadId].buttons[15].pressed || gamepad[this.gamepadId].axes[0] === 1
-      }
-    }
+    
   }
 }
 
@@ -189,18 +214,23 @@ function setColor(_main, _color) {
 
 addEventListener('load', (e) => {
   const main = new (Main)()
+
   Screen.Init(main, canvas)
   Screen.Init(main, bg)
+  Screen.Init(main, grid)
   Screen.Init(main, interact)
-  Input.Input(main, canvas)
+
   Loader_Init(main.images)
+  
+  Input.Input(main, canvas)
 
   main.init()
+
   updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
   
   function updateInfoBar(_h1, _keys) {
     _h1.innerHTML = `[${main.input.activeTool}] ${_keys}`
-    mouseCursor.style.cursor = main.cursors[main.input.activeTool]
+    // mouseCursor.style.cursor = main.cursors[main.input.activeTool]
   }
 
   saveButton.addEventListener('click', function(e) {
@@ -214,19 +244,21 @@ addEventListener('load', (e) => {
   toolPencil.addEventListener('click', function(e) {
     main.input.activeTool = 'Pencil'
     updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
-    // setColor(main, main.input.color)
+  })
+
+  toolLine.addEventListener('click', function(e) {
+    main.input.activeTool = 'Line'
+    updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
   })
 
   toolEraser.addEventListener('click', function(e) {
     main.input.activeTool = 'Eraser'
     updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
-    // setColor(main, main.input.color)
   })
 
   toolPicker.addEventListener('click', function(e) {
     main.input.activeTool = 'Picker'
     updateInfoBar(infoText, main.toolInfo[main.input.activeTool])
-    // setColor(main, main.input.color)
   })
 
   brushSize.addEventListener('change', function(e) {
@@ -257,9 +289,14 @@ addEventListener('load', (e) => {
     // if (main.input.color !== combinedColor) main.input.color = combinedColor
   })
 
+  // Keyboard
+  addEventListener("keydown", keyListener);
+  // addEventListener("keyup", keyListener);
+
   addEventListener('resize', (e) => {
     Screen.Resize(main, main.bgCtx, bg)
     Screen.Resize(main, main.ctx, canvas)
+    Screen.Resize(main, main.gridCtx, grid)
     Screen.Resize(main, main.interactCtx, interact)
   })
 
@@ -300,6 +337,21 @@ function hexToRGB(hex){
   return `rgb(${r}, ${g}, ${b})`
 }
 
+function padZero(str, len) {
+  len = len || 2;
+  const zeros = new Array(len).join('0');
+  return (zeros + str).slice(-len);
+}
+
+function invertRGB(_color) {
+  // invert color components
+  const r = (255 - parseInt(_color.r, 16)).toString(16),
+      g = (255 - parseInt(_color.g, 16)).toString(16),
+      b = (255 - parseInt(_color.b, 16)).toString(16);
+  // pad each with zeros and return
+  return '#' + padZero(r) + padZero(g) + padZero(b);
+}
+
 function saveImage(){
   const downloadLink = document.createElement('a');
   downloadLink.setAttribute('download', 'Pixels.png');
@@ -309,3 +361,28 @@ function saveImage(){
   downloadLink.setAttribute('href', url);
   downloadLink.click();
 }
+
+function gridVisibility (_visible) {
+  grid.style.visibility = _visible
+  main.visibleGrid = _visible
+}
+
+function gridVisibilityToggle () {
+  if (main.visibleGrid === 'visible') {
+    main.visibleGrid = 'hidden'
+  } else {
+    main.visibleGrid = 'visible'
+  }
+  gridVisibility(main.visibleGrid)
+}
+
+function keyListener (event) {
+  this.key_state = (event.type === "keydown")?true:false;
+
+  switch(event.key) {
+    case "g":
+      gridVisibilityToggle()
+    break
+  }
+}
+
