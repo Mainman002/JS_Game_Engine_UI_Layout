@@ -9,6 +9,7 @@ const mouseCursor = document.getElementsByTagName("body")[0];
 const infoText = document.querySelector('.brushTool')
 const brushSize = document.querySelector('.brushSize')
 const brushColor = document.querySelector('.brushColor')
+const brushBlur = document.querySelector('.brushBlur')
 
 // Top Panel Buttons
 const saveButton = document.querySelector('.saveButton')
@@ -44,6 +45,7 @@ class Main {
       click: false,
       released: false,
       color: '#000000',
+      blur: 0,
       activeTool: 'Pencil',
       lastTool: 'Pencil',
     }
@@ -174,7 +176,7 @@ class Main {
 
     if (this.input.click && inCanvasArea) {
       if (this.input.activeTool === 'Pencil') {
-        Graphic.Rect(this.ctx, this.input.pos, this.input.size, this.input.color, 1)
+        Graphic.Rect(this.ctx, this.input.pos, this.input.size, this.input.color, 1, this.input.blur)
       }
 
       if (this.input.activeTool === 'Eraser') {
@@ -186,6 +188,7 @@ class Main {
         const combinedColor = rgbToHex(color[0], color[1], color[2])
         this.input.color = combinedColor
         brushColor.value = combinedColor
+        brushBlur.value = 0
         // console.log(this.input.color)
       }
     }
@@ -212,6 +215,10 @@ class Main {
 
 function setColor(_main, _color) {
   if (_main.input.color !== _color) _main.input.color = _color
+}
+
+function setBlur(_main, _blur) {
+  if (_main.input.blur !== _blur) _main.input.blur = _blur
 }
 
 addEventListener('load', (e) => {
@@ -292,6 +299,16 @@ addEventListener('load', (e) => {
     const color = e.target.value
     const combinedColor = hexToRGB(color)
     setColor(main, combinedColor)
+    // if (main.input.color !== combinedColor) main.input.color = combinedColor
+  })
+
+  brushBlur.addEventListener('input', function(e) {
+    setBlur(main, e.target.value)
+    // if (main.input.color !== combinedColor) main.input.color = combinedColor
+  })
+
+  brushBlur.addEventListener('change', function(e) {
+    setBlur(main, e.target.value)
     // if (main.input.color !== combinedColor) main.input.color = combinedColor
   })
 

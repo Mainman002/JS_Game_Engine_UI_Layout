@@ -90,7 +90,8 @@ export function ActionLine(startPos, endPos, color, ctx, scale = 1) {
                     scale,scale); // fill in one pixel, 1x1
 }
 
-export function Rect (_ctx, _pos, _size, _color, _a) {
+export function Rect (_ctx, _pos, _size, _color, _a, _blur) {
+  _ctx.filter = `blur(${_blur}px)`;
   _ctx.globalAlpha = _a
   _ctx.fillStyle = _color
   _ctx.fillRect(_pos.x, _pos.y, _size.w, _size.h)
